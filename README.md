@@ -54,8 +54,68 @@ This project allows us to:
 
 ## Installation
 
-To run the MES locally:
-1. Clone the repository:  
+Follow these steps to set up the project on your local machine. Ensure Git and Python are installed before proceeding.
+
+### Step 1: Verify the Directory for Cloning
+
+Before cloning the repository, ensure you are in the correct directory on your computer where you want to download the project files.
+
+1. Open a terminal or command prompt.
+2. Navigate to the directory where you want to clone the repository using the `cd` (change directory) command:
+
    ```bash
-   git clone (https://github.com/Reebs296/455MES.git)
+   cd path/to/your/desired/folder
+   ```
+
+To check your current directory:
+
+   ```bash
+   pwd   # for Mac/Linux
+   ```
+or
+
+   ```bash
+   cd    # for Windows
+   ```
+
+## Step 2: Clone the Repository
+
+Once you are in the desired directory, clone the repository by running the following command:
+
+   ```bash
+   git clone https://github.com/Reebs296/455MES.git
+   ```
+
+This will download the project files into a folder named after the repository.
+
+## Step 3: Navigate to the Project Directory
+
+After cloning the repository, navigate to the project directory:
+
+   ```bash
    cd MES_Project
+   ```
+
+## Step 4: Install Dependencies
+
+To install the required dependencies, make sure you are in the project directory and run:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Step 5: Run the MES Server
+
+Once the dependencies are installed, start the MES application by running:
+
+   ```bash
+   python app.py
+   ```
+
+## Step 6: Access the MES Interface
+
+Once the server is running, open your web browser and navigate to the following URL to access the MES system:
+
+   ```bash
+   http://localhost:5000
+   ```

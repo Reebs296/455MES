@@ -1,4 +1,4 @@
-# 455MES
+# 455 MES
 
 # Course Overview, Content, and Objectives
 In this project-based course students will learn about factory-scale planning and control. Building on the

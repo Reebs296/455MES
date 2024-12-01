@@ -97,14 +97,6 @@ class Ui_MainWindow(object):
         self.textEdit.setGeometry(QtCore.QRect(240, 0, 861, 71))
         self.textEdit.setStyleSheet("background-color: rgb(3, 7, 90);")
         self.textEdit.setObjectName("textEdit")
-        self.label_13 = QtWidgets.QLabel(self.centralwidget)
-        self.label_13.setGeometry(QtCore.QRect(1020, 20, 61, 16))
-        self.label_13.setStyleSheet("background-color: rgb(255, 255, 255);")
-        self.label_13.setObjectName("label_13")
-        self.label_14 = QtWidgets.QLabel(self.centralwidget)
-        self.label_14.setGeometry(QtCore.QRect(1010, 40, 71, 16))
-        self.label_14.setStyleSheet("background-color: rgb(255, 255, 255);")
-        self.label_14.setObjectName("label_14")
         self.textEdit_4 = QtWidgets.QTextEdit(self.centralwidget)
         self.textEdit_4.setGeometry(QtCore.QRect(240, 90, 861, 31))
         self.textEdit_4.setStyleSheet("background-color: rgb(3, 7, 90);")
@@ -179,6 +171,16 @@ class Ui_MainWindow(object):
         self.textEdit_5.setGeometry(QtCore.QRect(240, 360, 861, 31))
         self.textEdit_5.setStyleSheet("background-color: rgb(3, 7, 90);")
         self.textEdit_5.setObjectName("textEdit_5")
+        self.label_13 = QtWidgets.QLabel(self.centralwidget)
+        self.label_13.setGeometry(QtCore.QRect(1000, 15, 81, 21))
+        self.label_13.setStyleSheet("background-color: rgb(255, 255, 255);")
+        self.label_13.setText("")
+        self.label_13.setObjectName("label_13")
+        self.label_14 = QtWidgets.QLabel(self.centralwidget)
+        self.label_14.setGeometry(QtCore.QRect(1000, 40, 81, 20))
+        self.label_14.setStyleSheet("background-color: rgb(255, 255, 255);")
+        self.label_14.setText("")
+        self.label_14.setObjectName("label_14")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -203,8 +205,6 @@ class Ui_MainWindow(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:26pt; color:#ffffff;\">ORDER SCHEDULING</span></p></body></html>"))
-        self.label_13.setText(_translate("MainWindow", "13/11/2024"))
-        self.label_14.setText(_translate("MainWindow", "04:45:51 PST"))
         self.textEdit_4.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"

@@ -1,0 +1,424 @@
+# command to install QtDesigner: pip install PyQt5Designer
+# command to create Python UI library: pyuic5 -o <UiLibraryName> <UiFileName>
+
+from loginWindow import Ui_MainWindow
+from overviewWindow import Ui_MainWindow as Ui_Overview
+from oeeWindow import Ui_MainWindow as Ui_Oee
+from newOrdersWindow import Ui_MainWindow as Ui_NewOrders
+from existingOrdersWindow import Ui_MainWindow as Ui_ExistingOrders
+from orderScheduleWindow import Ui_MainWindow as Ui_OrderSchedule
+from shiftScheduleWindow import Ui_MainWindow as Ui_ShiftSchedule
+from dateTime import DateTimeUpdater
+from oeePlotter import OEEPlotter
+from plotterTest import OEEPlotter as PlotterTest
+from oeeCalculator import OEECaculator
+
+from PyQt5 import QtWidgets as qtw
+from PyQt5 import QtCore as qtc
+from datetime import datetime
+import pytz
+import random
+from PyQt5.QtCore import QDate
+from PyQt5.QtWidgets import QGraphicsRectItem, QPushButton, QDateTimeEdit, QMessageBox
+
+class MANF455_Widget(qtw.QMainWindow):
+
+    def __init__(self):
+        super().__init__()
+
+        # create all page objects
+        self.ui = Ui_MainWindow()
+        self.ui_overview = Ui_Overview()
+        self.ui_oee = Ui_Oee()
+        self.ui_newOrders = Ui_NewOrders()
+        self.ui_existingOrders = Ui_ExistingOrders()
+        self.ui_orderSched = Ui_OrderSchedule()
+        self.ui_shiftSched = Ui_ShiftSchedule()
+
+        # Set up a QTimer to update the date and time every second
+        self.timer = qtc.QTimer(self)
+        self.timer.timeout.connect(self.updateDateTime)
+        self.timer.start(1000)  # Timeout interval in milliseconds (1000ms = 1 second)
+
+        self.date_range = []  # Initialize date_range as an empty list
+
+        # launch login page
+        self.ui.setupUi(self)
+
+        # Connect the Enter button to the checkCredentials method
+        self.ui.Enter.clicked.connect(self.checkCredentials)
+
+    def updateDateTime(self):
+        # Update the date and time for the current page (or add specific logic if you want different behavior)
+        if hasattr(self, 'current_ui'):
+            dt_updater = DateTimeUpdater(self.current_ui)
+            dt_updater.update()
+
+    def checkCredentials(self):
+        # Define valid credentials
+        credentials = {
+            "Worker": "1234",
+            "MaintenanceStaff": "1234",
+            "QualityControl": "1234",
+            "Management": "1234",
+        }
+
+        # Define first and last names based on user type
+        user_info = {
+        "Worker": {"first_name": "John", "last_name": "Doe"},
+        "MaintenanceStaff": {"first_name": "Seth", "last_name": "Loewen"},
+        "QualityControl": {"first_name": "Lucas", "last_name": "Fabian"},
+        "Management": {"first_name": "Alex", "last_name": "Rybka"},
+        }
+
+        # Define user roles
+        user_roles = {
+            "Worker": "Worker",
+            "MaintenanceStaff": "Maintenance Staff",
+            "QualityControl": "Quality Control",
+            "Management": "Management",
+        }
+
+        # Get entered username and password
+        username = self.ui.username.text()
+        password = self.ui.password.text()
+
+        # Check if the entered credentials match any valid user type
+        if username in credentials and credentials[username] == password:
+            # Assign login type and show success message
+            login_type = username  # The username corresponds to the login type
+            qtw.QMessageBox.information(self, "Login Status", f"Login Successful\nUser Type: {login_type}")
+
+            # Retrieve the first and last name from the user_info dictionary
+            first_name = user_info[login_type]["first_name"]
+            last_name = user_info[login_type]["last_name"]
+
+            # Retrieve the role from the user_roles dictionary
+            user_role = user_roles[login_type]
+
+            # Store the full name for later use
+            self.userFullName = f"{last_name}, {first_name}"
+            self.userRole = user_role
+
+            # launch overview page
+            self.showOverviewPage()
+
+        else:
+            # Show denied message for invalid credentials
+            qtw.QMessageBox.warning(self, "Login Status", "Denied!")    
+
+#This is the function to handle buttons on the Overview Page
+    def showOverviewPage(self):
+        self.ui_overview.setupUi(self)
+
+        # Set current_ui to the current page
+        self.current_ui = self.ui_overview
+
+        # Create DateTimeUpdater instance and update date/time
+        dt_updater = DateTimeUpdater(self.ui_overview)
+        dt_updater.update()
+
+        # button on overview page to change to oee page
+        self.ui_overview.pushButton_7.clicked.connect(self.showOeePage)
+        
+        # button on overview page to change to orders page
+        self.ui_overview.pushButton_14.clicked.connect(self.showNewOrdersPage)
+
+        # button on overview page to change to order scheduling page
+        self.ui_overview.pushButton_10.clicked.connect(self.showOrderSchedulePage)
+
+        # button on overview page to change to shift scheduling page
+        self.ui_overview.pushButton_13.clicked.connect(self.showShiftSchedulePage)
+
+        # button on overview page for the calendar 
+        self.ui_overview.calendarWidget.clicked.connect(self.onDateSelected)
+
+        # Display the full name and role in the QTextBrowser widgets on the overview page
+        self.displayUserFullName()
+        self.displayUserRole()
+
+#This is the function to handle buttons on the OEE Page
+    def showOeePage(self):
+        self.ui_oee.setupUi(self)
+
+        # Set current_ui to the current page
+        self.current_ui = self.ui_oee
+
+        # Create DateTimeUpdater instance and update date/time
+        dt_updater = DateTimeUpdater(self.ui_oee)
+        dt_updater.update()
+
+        # button on overview page to change to overview page
+        self.ui_oee.pushButton_5.clicked.connect(self.showOverviewPage)
+        
+        # button on overview page to change to orders page
+        self.ui_oee.pushButton_14.clicked.connect(self.showNewOrdersPage)
+
+        # button on overview page to change to order scheduling page
+        self.ui_oee.pushButton_10.clicked.connect(self.showOrderSchedulePage)
+
+        # button on overview page to change to shift scheduling page
+        self.ui_oee.pushButton_13.clicked.connect(self.showShiftSchedulePage)
+
+        # button on overview page to generate OEE calculation
+        self.ui_oee.commandLinkButton.clicked.connect(self.calculateOEE)
+
+        # button on overview page to generate availability calculation
+        self.ui_oee.commandLinkButton_2.clicked.connect(self.calculateAvailability)
+
+        # button on overview page to generate performance calculation
+        self.ui_oee.commandLinkButton_3.clicked.connect(self.calculatePerformance)
+
+        # button on overview page to generate quality calculation
+        self.ui_oee.commandLinkButton_4.clicked.connect(self.calculateQuality)
+        
+        # button on overview page to generate quality calculation
+        self.ui_oee.pushButton.clicked.connect(self.submitButton)
+
+#This is the function to handle buttons on the New Orders Page
+    def showNewOrdersPage(self):
+        self.ui_newOrders.setupUi(self)
+
+        # Set current_ui to the current page
+        self.current_ui = self.ui_newOrders
+
+        # Create DateTimeUpdater instance and update date/time
+        dt_updater = DateTimeUpdater(self.ui_newOrders)
+        dt_updater.update()
+
+        # button on overview page to change to overview page
+        self.ui_newOrders.pushButton_5.clicked.connect(self.showOverviewPage)
+
+        # button on overview page to change to oee page
+        self.ui_newOrders.pushButton_7.clicked.connect(self.showOeePage)
+        
+        # button on overview page to change to existing orders page
+        self.ui_newOrders.commandLinkButton_2.clicked.connect(self.showExistingOrdersPage)
+
+        # button on overview page to change to order scheduling page
+        self.ui_newOrders.pushButton_10.clicked.connect(self.showOrderSchedulePage)
+
+        # button on overview page to change to shift scheduling page
+        self.ui_newOrders.pushButton_13.clicked.connect(self.showShiftSchedulePage)
+
+#This is the function to handle buttons on the Existing Orders Page
+    def showExistingOrdersPage(self):
+        self.ui_existingOrders.setupUi(self)
+
+        # Set current_ui to the current page
+        self.current_ui = self.ui_existingOrders
+
+        # Create DateTimeUpdater instance and update date/time
+        dt_updater = DateTimeUpdater(self.ui_existingOrders)
+        dt_updater.update()
+
+        # button on overview page to change to overview page
+        self.ui_existingOrders.pushButton_5.clicked.connect(self.showOverviewPage)
+
+        # button on overview page to change to oee page
+        self.ui_existingOrders.pushButton_7.clicked.connect(self.showOeePage)
+        
+        # button on overview page to change to new orders page
+        self.ui_existingOrders.commandLinkButton.clicked.connect(self.showNewOrdersPage)
+
+        # button on overview page to change to order scheduling page
+        self.ui_existingOrders.pushButton_10.clicked.connect(self.showOrderSchedulePage)
+
+        # button on overview page to change to shift scheduling page
+        self.ui_existingOrders.pushButton_13.clicked.connect(self.showShiftSchedulePage) 
+    
+    #def showInventoryPage(self):
+
+    #def showTrackingPage(self):
+
+#This is the function to handle buttons on the Order Schedule Page
+    def showOrderSchedulePage(self):
+        self.ui_orderSched.setupUi(self)
+
+        # Set current_ui to the current page
+        self.current_ui = self.ui_orderSched
+
+        # Create DateTimeUpdater instance and update date/time
+        dt_updater = DateTimeUpdater(self.ui_orderSched)
+        dt_updater.update()
+
+        # button on overview page to change to overview page
+        self.ui_orderSched.pushButton_5.clicked.connect(self.showOverviewPage)
+
+        # button on overview page to change to oee page
+        self.ui_orderSched.pushButton_7.clicked.connect(self.showOeePage)
+        
+        # button on overview page to change to orders page
+        self.ui_orderSched.pushButton_14.clicked.connect(self.showNewOrdersPage)
+
+        # button on overview page to change to shift scheduling page
+        self.ui_orderSched.pushButton_13.clicked.connect(self.showShiftSchedulePage)
+
+#This is the function to handle buttons on the Shift Schedule Page
+    def showShiftSchedulePage(self):
+        self.ui_shiftSched.setupUi(self)
+
+        # Set current_ui to the current page
+        self.current_ui = self.ui_shiftSched
+
+        # Create DateTimeUpdater instance and update date/time
+        dt_updater = DateTimeUpdater(self.ui_shiftSched)
+        dt_updater.update()
+
+        # button on overview page to change to overview page
+        self.ui_shiftSched.pushButton_5.clicked.connect(self.showOverviewPage)
+
+        # button on overview page to change to oee page
+        self.ui_shiftSched.pushButton_7.clicked.connect(self.showOeePage)
+        
+        # button on overview page to change to orders page
+        self.ui_shiftSched.pushButton_14.clicked.connect(self.showNewOrdersPage)
+
+        # button on overview page to change to order scheduling page
+        self.ui_shiftSched.pushButton_10.clicked.connect(self.showOrderSchedulePage)
+
+    #def showReportsPage(self):
+
+############################################################################################
+
+# Below is a set of Functions to be Performed based on the GUI Page Listed.
+
+# Overview Page Functions:
+
+    def onDateSelected(self):
+        # Get the currently selected date
+        selected_date = self.ui_overview.calendarWidget.selectedDate()
+        #print(f"Selected Date: {selected_date.toString()}")
+        # Write code to access data for the graphical output based on the date clicked*****
+
+    # Function to display the user's full name in the QTextBrowser
+    def displayUserFullName(self):
+        # Ensure the QTextBrowser exists and is accessible
+        if hasattr(self.ui_overview, 'textBrowser'):
+            # Set the formatted full name into the textBrowser widget
+            self.ui_overview.textBrowser.setPlainText(self.userFullName)
+    
+    # Function to display the user's role in the QTextBrowser_2
+    def displayUserRole(self):
+        # Ensure the QTextBrowser_2 exists and is accessible
+        if hasattr(self.ui_overview, 'textBrowser_2'):
+            # Set the role into the textBrowser_2 widget
+            self.ui_overview.textBrowser_2.setPlainText(self.userRole)
+
+# OEE Page Functions:
+
+    def calculateOEE(self):
+        # Create an instance of OEECaculator
+        self.oee_calculator = OEECaculator()
+        # Calculate OEE
+        oee = self.oee_calculator.calculateOEE()
+
+        # Use the generate_date_range function
+        dates = self.submitButton()
+    
+        # Debugging: Ensure dates are generated properly
+        if not dates:
+            print("Error: No dates generated.")
+            QMessageBox.warning(self, "Error", "Date range is empty. Please set a valid date range.")
+            return
+
+    # ************************ NEEDS TO BE UPDATED WITH DATABASE INFO **************************************
+
+        # Ensure the length of the date list is consistent with the length of the generated arrays
+        num_dates = len(dates)
+
+        # Generate values for OEE, Availability, Performance, and Quality between 0 and 100
+        oee_values = [random.randint(0, 100) for _ in range(num_dates)]
+        availability_values = [random.randint(0, 100) for _ in range(num_dates)]
+        performance_values = [random.randint(0, 100) for _ in range(num_dates)]
+        quality_values = [random.randint(0, 100) for _ in range(num_dates)]
+
+        # Create an instance of OEEPlotter and plot the data
+        plotter = OEEPlotter(self.ui_oee.graphicsView_3)  # Pass graphicsView_3 widget to the plotter
+        plotter.plot_oee_data(dates, oee_values, availability_values, performance_values, quality_values)
+
+    # *******************************************************************************************************
+
+    def calculateAvailability(self):
+        # Create an instance of OEECaculator
+        self.oee_calculator = OEECaculator()
+        # Calculate OEE
+        oee = self.oee_calculator.calculateAvailability()
+
+    def calculatePerformance(self):
+        # Create an instance of OEECaculator
+        self.oee_calculator = OEECaculator()
+        # Calculate OEE
+        oee = self.oee_calculator.calculatePerformance()
+
+    def calculateQuality(self):
+        # Create an instance of OEECaculator
+        self.oee_calculator = OEECaculator()
+        # Calculate OEE
+        oee = self.oee_calculator.calculateQuality()
+
+    def submitButton(self):
+        # Retrieve the start date from the first QDateTimeEdit widget
+        start_date = self.ui_oee.dateTimeEdit.date()
+
+        # Retrieve the end date from the second QDateTimeEdit widget
+        end_date = self.ui_oee.dateTimeEdit_2.date()
+
+        # Print out the dates for debugging
+        print(f"Start Date (before conversion): {start_date.toString('yyyy-MM-dd')}")
+        print(f"End Date (before conversion): {end_date.toString('yyyy-MM-dd')}")
+
+        # Check if the start date is the same as the end date
+        if start_date == end_date:
+            # If they are the same, show a warning message
+            QMessageBox.warning(self, "Invalid Date Range", "Start date cannot be the same as the end date!")
+            return  # Exit the function if dates are the same
+
+        # Check if the start date is after the end date
+        if start_date > end_date:
+            # If the start date is after the end date, show an error message
+            QMessageBox.warning(self, "Invalid Date Range", "Start date must be before the end date!")
+            return  # Exit the function if the start date is after the end date
+
+        # Initialize an empty list to hold the date range
+        date_list = []
+
+        # Generate the list of dates between start_date and end_date
+        current_date = start_date
+        while current_date < end_date:  # Ensure we only include dates before the end date
+            date_list.append(current_date)  # Append QDate object (already in QDate format)
+            current_date = current_date.addDays(1)  # Move to the next day
+
+        # Store the dates in the date_range list if valid
+        self.date_range = [start_date, end_date]  # Store as QDate objects
+
+        # Show success message
+        QMessageBox.information(self, "Success", f"Date range set: {start_date.toString('yyyy-MM-dd')} to {end_date.toString('yyyy-MM-dd')}")
+
+        # Debugging: Ensure date_range is populated correctly
+        if self.date_range:
+            print(f"Start Date: {self.date_range[0].toString('yyyy-MM-dd')}, End Date: {self.date_range[1].toString('yyyy-MM-dd')}")
+        else:
+            print("Date range is empty. There was an issue with storing the dates.")
+
+        # Debugging: Print the generated date range (list of QDate objects)
+        print("Generated date range (QDate objects):", [date.toString('yyyy-MM-dd') for date in date_list])
+
+        # Return the generated list of QDate objects (between start_date and end_date)
+        return date_list
+
+# New Orders Page Functions: (LUCAS)
+
+# Existing Orders Page Functions: (LUCAS)
+
+# Orders Schedule Page Functions:
+
+# Shift Schedule Page Functions:
+
+if __name__ == '__main__':
+    app = qtw.QApplication([])
+
+    widget = MANF455_Widget()
+    widget.show()
+
+    app.exec_()

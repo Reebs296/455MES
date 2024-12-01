@@ -273,33 +273,33 @@ p, li { white-space: pre-wrap; }
    <widget class="QLabel" name="label_13">
     <property name="geometry">
      <rect>
-      <x>1020</x>
-      <y>20</y>
-      <width>61</width>
-      <height>16</height>
+      <x>1000</x>
+      <y>15</y>
+      <width>81</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
-     <string>13/11/2024</string>
+     <string/>
     </property>
    </widget>
    <widget class="QLabel" name="label_14">
     <property name="geometry">
      <rect>
-      <x>1010</x>
+      <x>1000</x>
       <y>40</y>
-      <width>71</width>
-      <height>16</height>
+      <width>81</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
-     <string>04:45:51 PST</string>
+     <string/>
     </property>
    </widget>
    <widget class="QGraphicsView" name="graphicsView_3">

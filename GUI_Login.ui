@@ -38,7 +38,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:28pt; color:#ffffff; vertical-align:sub;&quot;&gt;MES | OUTPUT STATION&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="username">
     <property name="geometry">
      <rect>
       <x>450</x>
@@ -64,7 +64,7 @@ p, li { white-space: pre-wrap; }
      <string>USERNAME:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
+   <widget class="QLineEdit" name="password">
     <property name="geometry">
      <rect>
       <x>450</x>
@@ -88,6 +88,19 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="text">
      <string>PASSWORD:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Enter">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>420</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ENTER</string>
     </property>
    </widget>
   </widget>

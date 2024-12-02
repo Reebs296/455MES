@@ -1,18 +1,57 @@
-# Manufacturing Execution System (MES) Project
+# Manufacturing Execution System (MES)
 
 ## Overview
 
-This project is part of the **Factory Planning (MANF 455)** course. The primary objective is to design and implement a **Manufacturing Execution System (MES)** that integrates with factory-level systems, providing seamless communication between production facilities and enterprise systems. Through this project, we will apply concepts from Level 0 to Level 3 of factory control and planning.
+The **Manufacturing Execution System (MES)** is a user-friendly application developed using PyQt5. Its purpose is to streamline manufacturing processes with the following key features:
 
-## Project Purpose
+1. **Login Authentication** – Secure, role-based access for operators and administrators.
+2. **Order Management** – Submit, manage, and track manufacturing orders.
+3. **Real-Time Monitoring** – Displays machine data and order progress.
 
-In modern manufacturing, companies face challenges like networking, rapid technological changes, and market fluctuations. An MES addresses these by connecting various production and business processes, ensuring efficiency, quality control, and real-time data acquisition. Our MES will focus on:
+---
 
-- **Production functions**: Scheduling, order generation, downtime tracking.
-- **Communication layer**: Data transmission between factory-level devices and ERP systems.
-- **Databases**: Storing and retrieving production data.
-- **User interfaces**: For monitoring and controlling production.
-- **Data analytics**: Measuring key performance indicators (KPIs) like Overall Equipment Efficiency (OEE).
+## Features
+
+### **1. Login Authentication**
+- Role-based access for Operators and Admins.
+- Credentials are securely stored and verified.
+
+### **2. Order Management**
+- Operators can submit and track production orders.
+- Admins have additional rights to view and manage all orders.
+
+### **3. Real-Time Monitoring**
+- Displays live data of the machine’s operational status.
+- Tracks the progress of orders in real time.
+
+---
+
+## Technical Details
+
+The application is built using:
+- **Frontend:** PyQt5 (for UI)
+- **Backend:** SQLite3 database for storing user credentials, order details, and machine data.
+- **Languages:** Python (Primary)
+
+---
+
+## Project Structure (WILL BE UPDATED)
+
+```plaintext
+MES/
+├── main.py          # Main application entry point
+├── ui/              # UI-related files
+│   ├── login.ui     # Login interface
+│   ├── dashboard.ui # Main dashboard
+├── db/              # Database-related files
+│   ├── init_db.py   # Database initialization script
+│   ├── database.db  # SQLite3 database file
+├── modules/         # Custom modules
+│   ├── auth.py      # Authentication logic
+│   ├── orders.py    # Order management logic
+│   ├── monitoring.py# Real-time monitoring logic
+└── README.md        # Project documentation (this file)
+```
 
 ## Learning Objectives
 
@@ -34,23 +73,8 @@ This project allows us to:
 
 - **Python**: For backend scripting and system logic.
 - **SQL**: Database management for production data.
-- **HTML/CSS/JavaScript**: Frontend for the MES user interface.
-- **Web services**: For communication between MES and ERP systems (using standard protocols such as OPC UA and web services for data exchange).
-
-## Team Roles
-
-- **Frontend Development**: Responsible for building the user interface.
-- **Backend Development**: Implements production functions and communication layers.
-- **Database Management**: Designs and manages the relational database.
-- **System Integration**: Ensures smooth communication between the MES and production equipment.
-
-## Project Milestones
-
-1. **Week 1-2**: Define functional specifications and outline system architecture.
-2. **Week 3-4**: Develop core MES production features and communication layers.
-3. **Week 5-6**: Implement database and integrate with frontend interfaces.
-4. **Week 7-8**: Add advanced functionality following the MESA model, including analytics.
-5. **Week 9-10**: Test the system, analyze performance, and make necessary improvements.
+- **PyQt5 Designer**: Frontend for the MES user interface.
+- **Tia Portal**: This is for communication between MES and ERP systems (using standard protocols such as OPC UA and web services for data exchange).
 
 ## Installation
 
@@ -109,13 +133,5 @@ To install the required dependencies, make sure you are in the project directory
 Once the dependencies are installed, start the MES application by running:
 
    ```bash
-   python app.py
-   ```
-
-## Step 6: Access the MES Interface
-
-Once the server is running, open your web browser and navigate to the following URL to access the MES system:
-
-   ```bash
-   http://localhost:5000
+   run TestRun.py
    ```

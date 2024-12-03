@@ -1,6 +1,7 @@
 # command to install QtDesigner: pip install PyQt5Designer
 # command to create Python UI library: pyuic5 -o <UiLibraryName> <UiFileName>
 
+import sqlite3
 from loginWindow import Ui_MainWindow
 from overviewWindow import Ui_MainWindow as Ui_Overview
 from oeeWindow import Ui_MainWindow as Ui_Oee
@@ -10,8 +11,9 @@ from orderScheduleWindow import Ui_MainWindow as Ui_OrderSchedule
 from shiftScheduleWindow import Ui_MainWindow as Ui_ShiftSchedule
 from dateTime import DateTimeUpdater
 from oeePlotter import OEEPlotter
-from plotterTest import OEEPlotter as PlotterTest
+#from plotterTest import OEEPlotter as PlotterTest
 from oeeCalculator import OEECaculator
+from DatabaseController import DatabaseController
 
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
@@ -419,16 +421,89 @@ class MANF455_Widget(qtw.QMainWindow):
 
 # New Orders Page Functions: (LUCAS)
 
+    def validateNewOrderInputs(self):
+        #Validate inputs for creating a new order
+        required_fields = [
+            self.ui_newOrders.textEdit_11.toPlainText(),  # Order Date
+            self.ui_newOrders.textEdit_12.toPlainText(),  # Order Time
+            self.ui_newOrders.lineEdit.text(),            # Customer Name
+            self.ui_newOrders.lineEdit_9.text()           # Product Number
+        ]
+    
+        if not all(required_fields):
+            qtw.QMessageBox.warning(self, "Validation Error", "Please fill out all required fields!")
+            return False
+        return True
+    
     def onOkClicked(self):
-        # Debugging: Print statement to verify the "OK" button is clicked
-        print("OK button clicked")
-        # You can add more code to perform the desired action after "OK" is clicked
-        pass
+        # Validate inputs
+        if not self.validateNewOrderInputs():
+            return
+
+        # Extract data from GUI
+        customer_name = self.ui_newOrders.lineEdit.text()       # Customer Name
+        phone_number = self.ui_newOrders.lineEdit_2.text()      # Phone Number
+        email = self.ui_newOrders.lineEdit_3.text()             # Email
+        shipping_address = self.ui_newOrders.lineEdit_4.text()  # Shipping Address
+        billing_address = self.ui_newOrders.lineEdit_5.text()   # Billing Address
+
+        product_number = self.ui_newOrders.lineEdit_9.text()    # Product Number
+        product_type = self.ui_newOrders.comboBox.currentText() # Product Type
+        upper_color = self.ui_newOrders.comboBox_2.currentText()# Upper Color
+        lower_color = self.ui_newOrders.comboBox_3.currentText()# Lower Color
+        upper_limit = self.ui_newOrders.lineEdit_8.text()       # Upper Limit
+        lower_limit = self.ui_newOrders.lineEdit_10.text()      # Lower Limit
+        order_date = self.ui_newOrders.textEdit_11.toPlainText()# Order Date
+        order_time = self.ui_newOrders.textEdit_12.toPlainText()# Order Time
+
+        self.insertData(customer_name, phone_number, email, shipping_address, billing_address,
+                    product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time)
+
+        # Database operations    
+        
+    def insertData(self, customer_name, phone_number, email, shipping_address, billing_address,
+               product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time):
+        try:
+            db = DatabaseController()
+
+            db.buildTables()
+            db.populateCustomers(customer_name, phone_number, email, shipping_address, billing_address)
+            db.populateOrders(product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time)
+
+            db.conn.commit()
+            print("Data successfully inserted into the database.")
+
+            # Test print Orders/Customers tables
+            print("\nCustomers Table:")
+            db.c.execute("SELECT * FROM Customers")
+            customers = db.c.fetchall()
+            for row in customers:
+                print(row)
+
+            print("\nOrders Table:")
+            db.c.execute("SELECT * FROM Orders")
+            orders = db.c.fetchall()
+            for row in orders:
+                print(row)
+        except sqlite3.Error as e:
+            print(f"An error occurred while inserting data: {e}")
+            db.conn.rollback()
 
     def onCancelClicked(self):
-        # Debugging: Print statement to verify the "Cancel" button is clicked
-        print("Cancel button clicked")
-        # You can add more code to perform the desired action after "Cancel" is clicked
+        #Clear all input fields in the New Orders page
+        self.ui_newOrders.textEdit_11.setPlainText("DD/MM/YYYY")  # Order Date
+        self.ui_newOrders.textEdit_12.setPlainText("hh:mm:ss")  # Order Time
+        self.ui_newOrders.lineEdit.clear()     # Customer Name
+        self.ui_newOrders.lineEdit_2.clear()   # Phone Number
+        self.ui_newOrders.lineEdit_3.clear()   # Email
+        self.ui_newOrders.lineEdit_4.clear()   # Shipping Address
+        self.ui_newOrders.lineEdit_5.clear()   # Billing Address
+        self.ui_newOrders.lineEdit_9.clear()   # Product Number
+        self.ui_newOrders.lineEdit_8.clear()   # Upper Limit
+        self.ui_newOrders.lineEdit_10.clear()  # Lower Limit
+        self.ui_newOrders.comboBox.setCurrentIndex(0)      # Product Type
+        self.ui_newOrders.comboBox_2.setCurrentIndex(0)    # Upper Color
+        self.ui_newOrders.comboBox_3.setCurrentIndex(0)    # Lower Color
         pass
 
 # Existing Orders Page Functions: (LUCAS)

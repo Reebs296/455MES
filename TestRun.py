@@ -14,7 +14,7 @@ from oeePlotter import OEEPlotter
 #from plotterTest import OEEPlotter as PlotterTest
 from oeeCalculator import OEECaculator
 from DatabaseController import DatabaseController
-
+import Communication
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 from datetime import datetime
@@ -553,7 +553,6 @@ class MANF455_Widget(qtw.QMainWindow):
             customers = db.c.fetchall()
             for row in customers:
                 print(row)
-
             
         except sqlite3.Error as e:
             print(f"An error occurred while inserting data: {e}")
@@ -567,6 +566,23 @@ class MANF455_Widget(qtw.QMainWindow):
         return
 
 if __name__ == '__main__':
+
+# MAIN COMMUNICATION LOOP #
+
+    # Connect to the database
+    conn = sqlite3.connect("MES.db")
+    cursor = conn.cursor()
+
+    # LOAD IN THE CURRENT ORDERS -> POPULATE THE PENDING ORDERS ARRAY -> MATCH PENDING ORDERS WITH PALLETS
+
+    # Process orders
+    Communication.process_orders(cursor, conn, Communication.pending_orders)
+
+    # Close the database connection
+    conn.close()
+
+# MAIN COMMUNICATION LOOP #
+
     app = qtw.QApplication([])
 
     widget = MANF455_Widget()

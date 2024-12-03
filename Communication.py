@@ -15,6 +15,8 @@ TASK_CODE_TAG = 'ns=3;s="abstractMachine"."task code"'
 # Global state for RFID tag presence
 presence = False
 
+pending_orders = []
+
 # Callback for RFID tag read completion
 def rfid_read_done_cb(value):
     global presence

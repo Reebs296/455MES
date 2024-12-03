@@ -473,6 +473,8 @@ class MANF455_Widget(qtw.QMainWindow):
             db.conn.commit()
             print("Data successfully inserted into the database.")
 
+            new_pending = Communication.load_orders(db.c, db.conn)
+
             # Test print Orders/Customers tables
             print("\nCustomers Table:")
             db.c.execute("SELECT * FROM Customers")
@@ -488,6 +490,8 @@ class MANF455_Widget(qtw.QMainWindow):
         except sqlite3.Error as e:
             print(f"An error occurred while inserting data: {e}")
             db.conn.rollback()
+
+        new_pending
 
     def onCancelClicked(self):
         #Clear all input fields in the New Orders page
@@ -567,21 +571,19 @@ class MANF455_Widget(qtw.QMainWindow):
 
 if __name__ == '__main__':
 
-# MAIN COMMUNICATION LOOP #
+# MAIN COMMUNICATION LOOP ############################################################################################
 
     # Connect to the database
-    conn = sqlite3.connect("MES.db")
-    cursor = conn.cursor()
+    db = DatabaseController
+    db.buildTables()
 
     # LOAD IN THE CURRENT ORDERS -> POPULATE THE PENDING ORDERS ARRAY -> MATCH PENDING ORDERS WITH PALLETS
+    Communication.pending_orders = Communication.load_orders(db.cursor, db.conn)
 
     # Process orders
-    Communication.process_orders(cursor, conn, Communication.pending_orders)
+    Communication.process_orders(db.cursor, db.conn, Communication.pending_orders)
 
-    # Close the database connection
-    conn.close()
-
-# MAIN COMMUNICATION LOOP #
+# MAIN COMMUNICATION LOOP END ########################################################################################
 
     app = qtw.QApplication([])
 

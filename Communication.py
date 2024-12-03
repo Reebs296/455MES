@@ -33,6 +33,15 @@ def get_active_employees(cursor, current_time):
     """, (current_time,))
     return cursor.fetchall()
 
+def load_orders(cursor, conn):
+
+    cursor.execute(""" SELECT * FROM Orders""")
+    pending_orders = cursor.fetchall()
+
+    conn.commit()
+
+    return pending_orders
+
 # Main processing loop
 def process_orders(cursor, conn, pending_orders):
     global presence

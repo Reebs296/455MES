@@ -16,7 +16,7 @@ class DatabaseController:
         # Create Customers table
         self.c.execute("""
         CREATE TABLE IF NOT EXISTS Customers (
-            customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            customer_id TEXT PRIMARY KEY,          -- Changed to TEXT and matches product_number
             name TEXT NOT NULL,
             phone_number TEXT,
             email TEXT,
@@ -27,9 +27,8 @@ class DatabaseController:
 
         # Create Orders table
         self.c.execute("""
-        CREATE TABLE IF NOT EXISTS Orders (
-            order_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            product_number TEXT NOT NULL,
+            CREATE TABLE IF NOT EXISTS Orders (
+            product_number TEXT PRIMARY KEY,       -- Primary Key and matches customer_id
             product_type TEXT NOT NULL,
             upper_color TEXT,
             lower_color TEXT,
@@ -37,7 +36,7 @@ class DatabaseController:
             lower_limit TEXT,
             order_date TEXT NOT NULL,
             order_time TEXT NOT NULL,
-            customer_id INTEGER NOT NULL,
+            customer_id TEXT NOT NULL,
             FOREIGN KEY (customer_id) REFERENCES Customers (customer_id)
         );
         """)
@@ -127,23 +126,21 @@ class DatabaseController:
         # Commit changes and verify
         self.conn.commit()
 
-    def populateCustomers(self, customer_name, phone_number, email, shipping_address, billing_address):
+    def populateCustomers(self, product_number, customer_name, phone_number, email, shipping_address, billing_address):
         # Insert into Customers table
         self.c.execute("""
-        INSERT INTO Customers (name, phone_number, email, shipping_address, billing_address)
-        VALUES (?, ?, ?, ?, ?)
-        """, (customer_name, phone_number, email, shipping_address, billing_address))
+        INSERT INTO Customers (customer_id, name, phone_number, email, shipping_address, billing_address)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, (product_number, customer_name, phone_number, email, shipping_address, billing_address))
 
 
     def populateOrders(self, product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time):
-        # Get the last inserted customer_id
-        customer_id = self.c.lastrowid
 
         # Insert into Orders table
         self.c.execute("""
         INSERT INTO Orders (product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time, customer_id)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time, customer_id))
+        """, (product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time, product_number))
 
     def populateShifts(self, firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date):
         # If the employee number matches with dates on the current sched, then the new info replaces that

@@ -512,6 +512,88 @@ class MANF455_Widget(qtw.QMainWindow):
 
 # Existing Orders Page Functions: (LUCAS)
 
+    def onOkClicked(self):
+        # Extract order placed date and time from the GUI
+        order_date = self.ui_existingOrders.textEdit_7.toPlainText()  # Order Placed Date
+        order_time = self.ui_existingOrders.textEdit_10.toPlainText()  # Order Placed Time
+
+        try:
+            db = DatabaseController()
+
+            # Query to fetch the existing order and customer data
+            query = """
+            SELECT c.customer_id, o.order_id, c.name, c.phone_number, c.email, c.shipping_address, c.billing_address,
+                o.product_number, o.product_type, o.upper_color, o.lower_color, o.upper_limit, o.lower_limit,
+                o.order_date, o.order_time
+            FROM Customers c
+            JOIN Orders o ON c.customer_id = o.customer_id
+            WHERE o.order_date = ? AND o.order_time = ?
+            """
+            db.c.execute(query, (order_date, order_time))
+            result = db.c.fetchone()
+
+            if result:
+                print("Order found. Populating fields for editing...")
+
+                # Populate GUI fields with existing data
+                self.ui_existingOrders.lineEdit.setText(result[2])  # Name
+                self.ui_existingOrders.lineEdit_2.setText(result[3])  # Phone Number
+                self.ui_existingOrders.lineEdit_3.setText(result[4])  # Email
+                self.ui_existingOrders.lineEdit_4.setText(result[5])  # Shipping Address
+                self.ui_existingOrders.lineEdit_5.setText(result[6])  # Billing Address
+                self.ui_existingOrders.lineEdit_9.setText(result[7])  # Product Number
+                self.ui_existingOrders.comboBox.setCurrentText(result[8])  # Product Type
+                self.ui_existingOrders.comboBox_2.setCurrentText(result[9])  # Upper Color
+                self.ui_existingOrders.comboBox_3.setCurrentText(result[10])  # Lower Color
+                self.ui_existingOrders.lineEdit_8.setText(result[11])  # Upper Limit
+                self.ui_existingOrders.lineEdit_10.setText(result[12])  # Lower Limit
+
+                # Save customer_id and order_id for later updates
+                self.current_customer_id = result[0]
+                self.current_order_id = result[1]
+            else:
+                print("No matching order found. Please check the date and time.")
+
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+
+    def updateOrder(self):
+        try:
+            db = DatabaseController()
+
+            # Extract updated data from GUI
+            customer_name = self.ui_existingOrders.lineEdit.text()  # Name
+            phone_number = self.ui_existingOrders.lineEdit_2.text()  # Phone Number
+            email = self.ui_existingOrders.lineEdit_3.text()  # Email
+            shipping_address = self.ui_existingOrders.lineEdit_4.text()  # Shipping Address
+            billing_address = self.ui_existingOrders.lineEdit_5.text()  # Billing Address
+            product_number = self.ui_existingOrders.lineEdit_9.text()  # Product Number
+            product_type = self.ui_existingOrders.comboBox.currentText()  # Product Type
+            upper_color = self.ui_existingOrders.comboBox_2.currentText()  # Upper Color
+            lower_color = self.ui_existingOrders.comboBox_3.currentText()  # Lower Color
+            upper_limit = self.ui_existingOrders.lineEdit_8.text()  # Upper Limit
+            lower_limit = self.ui_existingOrders.lineEdit_10.text()  # Lower Limit
+
+            # Update Customers table
+            db.c.execute("""
+            UPDATE Customers
+            SET name = ?, phone_number = ?, email = ?, shipping_address = ?, billing_address = ?
+            WHERE customer_id = ?
+            """, (customer_name, phone_number, email, shipping_address, billing_address, self.current_customer_id))
+
+            # Update Orders table
+            db.c.execute("""
+            UPDATE Orders
+            SET product_number = ?, product_type = ?, upper_color = ?, lower_color = ?, upper_limit = ?, lower_limit = ?
+            WHERE order_id = ?
+            """, (product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, self.current_order_id))
+
+            db.conn.commit()
+            print("Order successfully updated.")
+        except sqlite3.Error as e:
+            print(f"Error updating order: {e}")
+            db.conn.rollback()
+
 # Orders Schedule Page Functions:
 
 # Shift Schedule Page Functions:

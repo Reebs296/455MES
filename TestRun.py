@@ -574,14 +574,14 @@ if __name__ == '__main__':
 # MAIN COMMUNICATION LOOP ############################################################################################
 
     # Connect to the database
-    db = DatabaseController
+    db = DatabaseController()
     db.buildTables()
 
     # LOAD IN THE CURRENT ORDERS -> POPULATE THE PENDING ORDERS ARRAY -> MATCH PENDING ORDERS WITH PALLETS
-    Communication.pending_orders = Communication.load_orders(db.cursor, db.conn)
+    Communication.pending_orders = Communication.load_orders(db.c, db.conn)
 
     # Process orders
-    Communication.process_orders(db.cursor, db.conn, Communication.pending_orders)
+    #Communication.process_orders(db.c, db.conn, Communication.pending_orders)
 
 # MAIN COMMUNICATION LOOP END ########################################################################################
 

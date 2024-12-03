@@ -38,7 +38,7 @@ def load_orders(cursor, conn):
     cursor.execute(""" SELECT * FROM Orders""")
     pending_orders = cursor.fetchall()
 
-    conn.commit()
+    #FORMAT DATA
 
     return pending_orders
 

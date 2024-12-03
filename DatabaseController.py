@@ -144,6 +144,13 @@ class DatabaseController:
         INSERT INTO Orders (product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time, customer_id)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time, customer_id))
+
+    def populateShifts(self, firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date):
+        # If the employee number matches with dates on the current sched, then the new info replaces that
+        self.c.execute("""
+        INSERT INTO ShiftSchedule (firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date))
     
     """def populateTables(self):
         # Populate Employees table

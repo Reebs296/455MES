@@ -512,6 +512,60 @@ class MANF455_Widget(qtw.QMainWindow):
 
 # Shift Schedule Page Functions:
 
+# Shift Schedule Page Functions:
+
+    def submitShift(self):
+
+        shifts = {"Morning": (6, 14), "Afternoon": (14, 22), "Night": (22, 6)}
+        schedule = []
+
+        firstName = self.ui_shiftSched.lineEdit.text()
+        lastName = self.ui_shiftSched.lineEdit_2.text()
+        employeeNumber = self.ui_shiftSched.lineEdit_3.text()
+        maxHours = int(self.ui_shiftSched.lineEdit_4.text())
+        minHours = int(self.ui_shiftSched.lineEdit_5.text())
+
+        start_date = self.ui_shiftSched.dateTimeEdit.date()
+        end_date = self.ui_shiftSched.dateTimeEdit_2.date()
+
+        print("First Name: " + firstName)
+        print("Last Name: " + lastName)
+        print("Employee Number: " + employeeNumber)
+        print("Max Hours: " + maxHours)
+        print("Min Hours: " + minHours)
+
+        # Convert dates to datetime objects
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+        try:
+            db = DatabaseController()
+
+            db.buildTables()
+            db.populateShifts(firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date)
+
+            db.conn.commit()
+            print("Data successfully inserted into the database.")
+
+            # Test print Orders/Customers tables
+            print("\nShift Schedule Table:")
+            db.c.execute("SELECT * FROM ShiftSchedule")
+            customers = db.c.fetchall()
+            for row in customers:
+                print(row)
+
+            
+        except sqlite3.Error as e:
+            print(f"An error occurred while inserting data: {e}")
+            db.conn.rollback()
+
+    def updateShifts(firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date):
+        # Function will update the figure in the Shift Schedule window to display the shifts
+        # Get data
+        # Format data
+        # Display data
+        return
+
 if __name__ == '__main__':
     app = qtw.QApplication([])
 

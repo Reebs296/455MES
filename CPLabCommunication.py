@@ -15,7 +15,8 @@ EXEC_ORDER_TAG = 'ns=3;s="abstractMachine"."exec_order"'
 ORDER_COMPLETE_TAG = 'ns=3;s="abstractMachine"."order_complete"'
 
 # Initialize global variable for RFID read completion presence
-presence = False
+global presence
+pending_orders = []
 
 def rfid_read_done_cb(tag_name, value):
     global presence
@@ -23,16 +24,11 @@ def rfid_read_done_cb(tag_name, value):
         presence = True
     print(f"Tag '{tag_name}' changed to : {value}")
 
-if __name__ == "__main__":
-    #get orders from somewhere database or sth
-    pending_orders = [
-        # Order(orderID=0, taskCode=0),
-        Order(orderID=101, taskCode=1, ordertype=Ordertype.PROD),
-        Order(orderID=102, taskCode=0, ordertype=Ordertype.CSTM),
-        # Order(orderID=103, taskCode=1, ordertype=Ordertype.CSTM),
-        # Order(orderID=104, taskCode=0, ordertype=Ordertype.PROD)
+def process_orders(pending_orders):
 
-    ]
+    global presence
+    presence = False
+
     pending_order_ids = [int(order.orderID) for order in pending_orders]
     print(f"Pending orders ids: {pending_order_ids}")
     completed_orders = []

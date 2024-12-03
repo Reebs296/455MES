@@ -87,9 +87,6 @@ class PLC_comm:
         except Exception as e:
             print(" INFO : Error during disconnect:", e)
 
-
-
-
 if __name__ == "__main__":
     SERVER_ADDR = 'opc.tcp://172.21.10.1:4840'
     comms = PLC_comm(SERVER_ADDR)
@@ -112,3 +109,4 @@ if __name__ == "__main__":
         print("Shutting down OPC-UA client...")
     finally:
         comms.disconnect()
+

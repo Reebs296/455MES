@@ -14,12 +14,13 @@ from oeePlotter import OEEPlotter
 #from plotterTest import OEEPlotter as PlotterTest
 from oeeCalculator import OEECaculator
 from DatabaseController import DatabaseController
-import Communication
+import CPLabCommunication
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 from datetime import datetime
 import pytz
 import random
+from CPLabOrders import Order
 import logging
 from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import QGraphicsRectItem, QPushButton, QDateTimeEdit, QMessageBox
@@ -473,7 +474,7 @@ class MANF455_Widget(qtw.QMainWindow):
             db.conn.commit()
             print("Data successfully inserted into the database.")
 
-            new_pending = Communication.load_orders(db.c, db.conn)
+            new_pending = CPLabCommunication.load_orders(db.c, db.conn)
 
             # Test print Orders/Customers tables
             print("\nCustomers Table:")
@@ -490,8 +491,6 @@ class MANF455_Widget(qtw.QMainWindow):
         except sqlite3.Error as e:
             print(f"An error occurred while inserting data: {e}")
             db.conn.rollback()
-
-        new_pending
 
     def onCancelClicked(self):
         #Clear all input fields in the New Orders page
@@ -661,11 +660,17 @@ if __name__ == '__main__':
     db = DatabaseController()
     db.buildTables()
 
+    CPLabCommunication.pending_orders = [
+        Order(101, 1, None),
+        Order(102, 2, None),
+        Order(103, 3, None)
+    ]
+
     # LOAD IN THE CURRENT ORDERS -> POPULATE THE PENDING ORDERS ARRAY -> MATCH PENDING ORDERS WITH PALLETS
-    Communication.pending_orders = Communication.load_orders(db.c, db.conn)
+    #Communication.pending_orders = Communication.load_orders(db.c, db.conn)
 
     # Process orders
-    #Communication.process_orders(db.c, db.conn, Communication.pending_orders)
+    CPLabCommunication.process_orders(CPLabCommunication.pending_orders)
 
 # MAIN COMMUNICATION LOOP END ########################################################################################
 

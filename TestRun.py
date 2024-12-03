@@ -236,8 +236,8 @@ class MANF455_Widget(qtw.QMainWindow):
         self.ui_existingOrders.pushButton_13.clicked.connect(self.showShiftSchedulePage)
 
         # Connect buttonBox signals to the appropriate functions
-        self.ui_existingOrders.buttonBox.accepted.connect(self.onOkClicked)
-        self.ui_existingOrders.buttonBox.rejected.connect(self.onCancelClicked)
+        self.ui_existingOrders.buttonBox.accepted.connect(self.onOkClicked2)
+        self.ui_existingOrders.buttonBox.rejected.connect(self.onCancelClicked) #NEED TO UPDATE WHEN onCancelClicked EXISTS!!!!!!
     
     #def showInventoryPage(self):
 
@@ -512,7 +512,7 @@ class MANF455_Widget(qtw.QMainWindow):
 
 # Existing Orders Page Functions: (LUCAS)
 
-    def onOkClicked(self):
+    def onOkClicked2(self):
         # Extract order placed date and time from the GUI
         order_date = self.ui_existingOrders.textEdit_7.toPlainText()  # Order Placed Date
         order_time = self.ui_existingOrders.textEdit_10.toPlainText()  # Order Placed Time
@@ -593,6 +593,8 @@ class MANF455_Widget(qtw.QMainWindow):
         except sqlite3.Error as e:
             print(f"Error updating order: {e}")
             db.conn.rollback()
+
+    #def onCancelClicked2(self):
 
 # Orders Schedule Page Functions:
 

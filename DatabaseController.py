@@ -142,6 +142,22 @@ class DatabaseController:
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time, product_number))
 
+    def updateCustomerAndOrder(self, product_number, customer_name, phone_number, email, shipping_address, billing_address,
+                           product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time):
+        # Update Customers table
+        self.c.execute("""
+        UPDATE Customers
+        SET name = ?, phone_number = ?, email = ?, shipping_address = ?, billing_address = ?
+        WHERE customer_id = ?
+        """, (customer_name, phone_number, email, shipping_address, billing_address, product_number))
+
+        # Update Orders table
+        self.c.execute("""
+        UPDATE Orders
+        SET product_type = ?, upper_color = ?, lower_color = ?, upper_limit = ?, lower_limit = ?, order_date = ?, order_time = ?
+        WHERE product_number = ?
+        """, (product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time, product_number))
+
     def populateShifts(self, firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date):
         # If the employee number matches with dates on the current sched, then the new info replaces that
         self.c.execute("""

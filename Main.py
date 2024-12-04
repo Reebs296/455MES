@@ -239,7 +239,7 @@ class MANF455_Widget(qtw.QMainWindow):
 
         # Connect buttonBox signals to the appropriate functions
         self.ui_existingOrders.buttonBox.accepted.connect(self.onOkClicked2)
-        self.ui_existingOrders.buttonBox.rejected.connect(self.onCancelClicked) #NEED TO UPDATE WHEN onCancelClicked EXISTS!!!!!!
+        self.ui_existingOrders.buttonBox.rejected.connect(self.onCancelClicked2) 
     
     #def showInventoryPage(self):
 
@@ -551,88 +551,117 @@ class MANF455_Widget(qtw.QMainWindow):
 # Existing Orders Page Functions: (LUCAS)
 
     def onOkClicked2(self):
-        # Extract order placed date and time from the GUI
-        product_number = self.ui_existingOrders.lineEdit_9.text()  # Product Number grab
+        # Extract product number from the GUI
+        product_number = self.ui_existingOrders.lineEdit_9.text()  # Product Number
 
         try:
             db = DatabaseController()
 
-            # Query to fetch the existing order and customer data
-            query = """
-            SELECT c.customer_id, o.order_id, c.name, c.phone_number, c.email, c.shipping_address, c.billing_address,
-                o.product_number, o.product_type, o.upper_color, o.lower_color, o.upper_limit, o.lower_limit,
-                o.order_date, o.order_time
-            FROM Customers c
-            JOIN Orders o ON c.customer_id = o.customer_id
-            WHERE o.order_date = ? AND o.order_time = ?
-            """
-            db.c.execute(query, (product_number))
-            result = db.c.fetchone()
+            if not hasattr(self, 'edit_mode') or not self.edit_mode:
+                # First click: Check if the product exists
+                query = """
+                SELECT c.customer_id, c.name, c.phone_number, c.email, c.shipping_address, c.billing_address,
+                    o.product_number, o.product_type, o.upper_color, o.lower_color, o.upper_limit, o.lower_limit,
+                    o.order_date, o.order_time
+                FROM Customers c
+                JOIN Orders o ON c.customer_id = o.customer_id
+                WHERE o.product_number = ?
+                """
+                db.c.execute(query, (product_number,))
+                result = db.c.fetchone()
 
-            if result:
-                print("Order found. Populating fields for editing...")
+                if result:
+                    print("Order found. Populating fields for editing...")
 
-                # Populate GUI fields with existing data
-                self.ui_existingOrders.lineEdit.setText(result[2])  # Name
-                self.ui_existingOrders.lineEdit_2.setText(result[3])  # Phone Number
-                self.ui_existingOrders.lineEdit_3.setText(result[4])  # Email
-                self.ui_existingOrders.lineEdit_4.setText(result[5])  # Shipping Address
-                self.ui_existingOrders.lineEdit_5.setText(result[6])  # Billing Address
-                self.ui_existingOrders.lineEdit_9.setText(result[7])  # Product Number
-                self.ui_existingOrders.comboBox.setCurrentText(result[8])  # Product Type
-                self.ui_existingOrders.comboBox_2.setCurrentText(result[9])  # Upper Color
-                self.ui_existingOrders.comboBox_3.setCurrentText(result[10])  # Lower Color
-                self.ui_existingOrders.lineEdit_8.setText(result[11])  # Upper Limit
-                self.ui_existingOrders.lineEdit_10.setText(result[12])  # Lower Limit
+                    # Populate GUI fields with existing data
+                    self.ui_existingOrders.lineEdit.setText(result[1])  # Name
+                    self.ui_existingOrders.lineEdit_2.setText(result[2])  # Phone Number
+                    self.ui_existingOrders.lineEdit_3.setText(result[3])  # Email
+                    self.ui_existingOrders.lineEdit_4.setText(result[4])  # Shipping Address
+                    self.ui_existingOrders.lineEdit_5.setText(result[5])  # Billing Address
+                    self.ui_existingOrders.lineEdit_9.setText(result[6])  # Product Number
+                    self.ui_existingOrders.comboBox.setCurrentText(result[7])  # Product Type
+                    self.ui_existingOrders.comboBox_2.setCurrentText(result[8])  # Upper Color
+                    self.ui_existingOrders.comboBox_3.setCurrentText(result[9])  # Lower Color
+                    self.ui_existingOrders.lineEdit_8.setText(result[10])  # Upper Limit
+                    self.ui_existingOrders.lineEdit_10.setText(result[11])  # Lower Limit
+                    self.ui_existingOrders.textEdit_7.setPlainText(result[12])  # Order Date
+                    self.ui_existingOrders.textEdit_10.setPlainText(result[13])  # Order Time
 
-                # Save customer_id and order_id for later updates
-                self.current_customer_id = result[0]
-                self.current_order_id = result[1]
+                    # Save customer_id for later updates
+                    self.current_customer_id = result[0]
+
+                    # Enable edit mode
+                    self.edit_mode = True
+                    print("Edit mode enabled. Modify fields and click OK again to save changes.")
+                else:
+                    qtw.QMessageBox.warning(self, "Validation Error", "Product number not found!")
+                    print("Product number not found!")
+
             else:
-                print("No matching order found. Please check the date and time.")
+                # Second click: Update database with new information
+                print("Updating existing order and customer...")
+
+                # Extract data from GUI
+                customer_name = self.ui_existingOrders.lineEdit.text()  # Name
+                phone_number = self.ui_existingOrders.lineEdit_2.text()  # Phone Number
+                email = self.ui_existingOrders.lineEdit_3.text()  # Email
+                shipping_address = self.ui_existingOrders.lineEdit_4.text()  # Shipping Address
+                billing_address = self.ui_existingOrders.lineEdit_5.text()  # Billing Address
+                product_type = self.ui_existingOrders.comboBox.currentText()  # Product Type
+                upper_color = self.ui_existingOrders.comboBox_2.currentText()  # Upper Color
+                lower_color = self.ui_existingOrders.comboBox_3.currentText()  # Lower Color
+                upper_limit = self.ui_existingOrders.lineEdit_8.text()  # Upper Limit
+                lower_limit = self.ui_existingOrders.lineEdit_10.text()  # Lower Limit
+                order_date = self.ui_existingOrders.textEdit_7.toPlainText()  # Order Date
+                order_time = self.ui_existingOrders.textEdit_10.toPlainText()  # Order Time
+
+                # Update database with new info
+                db.updateCustomerAndOrder(
+                    product_number, customer_name, phone_number, email, shipping_address, billing_address,
+                    product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time
+                )
+
+                db.conn.commit()
+                print("Order successfully updated.")
+                qtw.QMessageBox.information(self, "Update Successful", "Order and customer information updated.")
+
+                # Test print Orders/Customers tables
+                print("\nCustomers Table:")
+                db.c.execute("SELECT * FROM Customers")
+                customers = db.c.fetchall()
+                for row in customers:
+                    print(row)
+
+                print("\nOrders Table:")
+                db.c.execute("SELECT * FROM Orders")
+                orders = db.c.fetchall()
+                for row in orders:
+                    print(row)
+
+                # Reset edit mode
+                self.edit_mode = False
 
         except sqlite3.Error as e:
             print(f"Database error: {e}")
 
-    def updateOrder(self):
-        try:
-            db = DatabaseController()
-
-            # Extract updated data from GUI
-            customer_name = self.ui_existingOrders.lineEdit.text()  # Name
-            phone_number = self.ui_existingOrders.lineEdit_2.text()  # Phone Number
-            email = self.ui_existingOrders.lineEdit_3.text()  # Email
-            shipping_address = self.ui_existingOrders.lineEdit_4.text()  # Shipping Address
-            billing_address = self.ui_existingOrders.lineEdit_5.text()  # Billing Address
-            product_number = self.ui_existingOrders.lineEdit_9.text()  # Product Number
-            product_type = self.ui_existingOrders.comboBox.currentText()  # Product Type
-            upper_color = self.ui_existingOrders.comboBox_2.currentText()  # Upper Color
-            lower_color = self.ui_existingOrders.comboBox_3.currentText()  # Lower Color
-            upper_limit = self.ui_existingOrders.lineEdit_8.text()  # Upper Limit
-            lower_limit = self.ui_existingOrders.lineEdit_10.text()  # Lower Limit
-
-            # Update Customers table
-            db.c.execute("""
-            UPDATE Customers
-            SET name = ?, phone_number = ?, email = ?, shipping_address = ?, billing_address = ?
-            WHERE customer_id = ?
-            """, (customer_name, phone_number, email, shipping_address, billing_address, self.current_customer_id))
-
-            # Update Orders table
-            db.c.execute("""
-            UPDATE Orders
-            SET product_number = ?, product_type = ?, upper_color = ?, lower_color = ?, upper_limit = ?, lower_limit = ?
-            WHERE order_id = ?
-            """, (product_number, product_type, upper_color, lower_color, upper_limit, lower_limit, self.current_order_id))
-
-            db.conn.commit()
-            print("Order successfully updated.")
-        except sqlite3.Error as e:
-            print(f"Error updating order: {e}")
-            db.conn.rollback()
-
-    #def onCancelClicked2(self):
-
+    def onCancelClicked2(self):
+        #Clear all input fields in the New Orders page
+        self.ui_existingOrders.textEdit_7.setPlainText("DD/MM/YYYY")  # Order Date
+        self.ui_existingOrders.textEdit_10.setPlainText("hh:mm:ss")  # Order Time
+        self.ui_existingOrders.lineEdit.clear()     # Customer Name
+        self.ui_existingOrders.lineEdit_2.clear()   # Phone Number
+        self.ui_existingOrders.lineEdit_3.clear()   # Email
+        self.ui_existingOrders.lineEdit_4.clear()   # Shipping Address
+        self.ui_existingOrders.lineEdit_5.clear()   # Billing Address
+        self.ui_existingOrders.lineEdit_9.clear()   # Product Number
+        self.ui_existingOrders.lineEdit_8.clear()   # Upper Limit
+        self.ui_existingOrders.lineEdit_10.clear()  # Lower Limit
+        self.ui_existingOrders.comboBox.setCurrentIndex(0)      # Product Type
+        self.ui_existingOrders.comboBox_2.setCurrentIndex(0)    # Upper Color
+        self.ui_existingOrders.comboBox_3.setCurrentIndex(0)    # Lower Color
+        self.edit_mode = False
+        print("Update cancelled")
 # Orders Schedule Page Functions:
 
 # Shift Schedule Page Functions:

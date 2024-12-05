@@ -606,8 +606,11 @@ class MANF455_Widget(qtw.QMainWindow):
                     self.ui_existingOrders.comboBox.setCurrentText(result[7])  # Product Type
                     self.ui_existingOrders.comboBox_2.setCurrentText(result[8])  # Upper Color
                     self.ui_existingOrders.comboBox_3.setCurrentText(result[9])  # Lower Color
-                    self.ui_existingOrders.lineEdit_8.setText(result[10])  # Upper Limit
-                    self.ui_existingOrders.lineEdit_10.setText(result[11])  # Lower Limit
+
+                    # Convert float (upper_limit) to string for display in QLineEdit
+                    self.ui_existingOrders.lineEdit_8.setText(f"{result[10]:.2f}")  # Upper Limit
+                    self.ui_existingOrders.lineEdit_10.setText(f"{result[11]:.2f}")  # Lower Limit
+
                     self.ui_existingOrders.textEdit_7.setPlainText(result[12])  # Order Date
                     self.ui_existingOrders.textEdit_10.setPlainText(result[13])  # Order Time
 
@@ -634,8 +637,21 @@ class MANF455_Widget(qtw.QMainWindow):
                 product_type = self.ui_existingOrders.comboBox.currentText()  # Product Type
                 upper_color = self.ui_existingOrders.comboBox_2.currentText()  # Upper Color
                 lower_color = self.ui_existingOrders.comboBox_3.currentText()  # Lower Color
-                upper_limit = self.ui_existingOrders.lineEdit_8.text()  # Upper Limit
-                lower_limit = self.ui_existingOrders.lineEdit_10.text()  # Lower Limit
+
+                # Convert Upper Limit from string to float
+                upper_limit_str = self.ui_existingOrders.lineEdit_8.text()  # Upper Limit (string)
+                try:
+                    upper_limit = float(upper_limit_str)  # Convert to float
+                except ValueError:
+                    upper_limit = 0.0  # Default value if conversion fails
+
+                # Convert Lower Limit from string to float
+                lower_limit_str = self.ui_existingOrders.lineEdit_10.text()  # Lower Limit (string)
+                try:
+                    lower_limit = float(lower_limit_str)  # Convert to float
+                except ValueError:
+                    lower_limit = 0.0  # Default value if conversion fails
+
                 order_date = self.ui_existingOrders.textEdit_7.toPlainText()  # Order Date
                 order_time = self.ui_existingOrders.textEdit_10.toPlainText()  # Order Time
 
@@ -649,7 +665,7 @@ class MANF455_Widget(qtw.QMainWindow):
                 print("Order successfully updated.")
                 qtw.QMessageBox.information(self, "Update Successful", "Order and customer information updated.")
 
-                # Test print Orders/Customers tables
+                # Optionally, print tables to verify the data
                 print("\nCustomers Table:")
                 db.c.execute("SELECT * FROM Customers")
                 customers = db.c.fetchall()

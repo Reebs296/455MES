@@ -530,7 +530,7 @@ class MANF455_Widget(qtw.QMainWindow):
             db.conn.commit()
             print("Data successfully inserted into the database.")
 
-            new_pending = Communication.load_orders(db.c, db.conn)
+            #new_pending = Communication.load_orders(db.c, db.conn)
 
             # Test print Orders/Customers tables
             print("\nCustomers Table:")
@@ -544,6 +544,10 @@ class MANF455_Widget(qtw.QMainWindow):
             orders = db.c.fetchall()
             for row in orders:
                 print(row)
+
+            #CPLabCommunication.pending_orders = CPLabCommunication.load_orders(db.c, db.conn)
+            #CPLabCommunication.process_orders(CPLabCommunication.pending_orders)
+
         except sqlite3.Error as e:
             print(f"An error occurred while inserting data: {e}")
             db.conn.rollback()
@@ -750,17 +754,17 @@ if __name__ == '__main__':
     db = DatabaseController()
     db.buildTables()
 
-    CPLabCommunication.pending_orders = [
-        Order(101, 1, None),
-        Order(102, 2, None),
-        Order(103, 3, None)
-    ]
+    '''db.populateCustomers(1, 'Seth', 1, "seth", 'shipping_address', 'billing_address')
+    db.populateCustomers(2, 'Seth', 1, "seth", 'shipping_address', 'billing_address')
+    db.populateCustomers(3, 'Seth', 1, "seth", 'shipping_address', 'billing_address')
+    db.populateCustomers(4, 'Seth', 1, "seth", 'shipping_address', 'billing_address')
+    db.populateCustomers(5, 'Seth', 1, "seth", 'shipping_address', 'billing_address')
 
-    # LOAD IN THE CURRENT ORDERS -> POPULATE THE PENDING ORDERS ARRAY -> MATCH PENDING ORDERS WITH PALLETS
-    Communication.pending_orders = Communication.load_orders(db.c, db.conn)
-
-    # Process orders
-    #CPLabCommunication.process_orders(CPLabCommunication.pending_orders)
+    db.populateOrders(1, 'Phone', 'Red', 'Red', '2', '1', 'DDMMYYYY', 'DDMMYYYY')
+    db.populateOrders(2, 'Phone', 'Blue', 'Red', '2', '1', 'DDMMYYYY', 'DDMMYYYY')
+    db.populateOrders(3, 'Phone', 'Purple', 'Red', '2', '1', 'DDMMYYYY', 'DDMMYYYY')
+    db.populateOrders(4, 'Phone', 'White', 'Red', '2', '1', 'DDMMYYYY', 'DDMMYYYY')
+    db.populateOrders(5, 'Phone', 'Black', 'Red', '2', '1', 'DDMMYYYY', 'DDMMYYYY')'''
 
 # MAIN COMMUNICATION LOOP END ########################################################################################
 

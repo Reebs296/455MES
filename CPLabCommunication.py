@@ -1,6 +1,7 @@
 import time
 from CPLab_PLC_Communication import PLC_comm
 from CPLabOrders import Order, Status, Ordertype
+from DatabaseController import DatabaseController
 
 # Define MES server address and client configuration
 SERVER_ADDR = 'opc.tcp://172.21.10.1:4840'
@@ -23,6 +24,24 @@ def rfid_read_done_cb(tag_name, value):
     if value:
         presence = True
     print(f"Tag '{tag_name}' changed to : {value}")
+
+def load_orders(cursor, conn):
+
+    cursor.execute(""" SELECT product_number, upper_color FROM Orders""")
+    temp_list = cursor.fetchall()
+    pending_orders = []
+
+    for order in temp_list:
+
+        if order[1] == 'Red' or 'Black': taskCode = 1
+        elif order[1] == 'Blue' or 'White': taskCode = 0
+        else: taskCode == -1
+
+        temp_order = Order(int(order[0]), taskCode, None)
+
+        pending_orders.append(temp_order)
+
+    return pending_orders
 
 def process_orders(pending_orders):
 
@@ -89,3 +108,19 @@ def process_orders(pending_orders):
     
     finally:
         comms.disconnect()
+
+if __name__ == '__main__':
+
+    pending_orders = None
+
+    db = DatabaseController()
+
+    while True:
+
+        pending_orders = load_orders(db.c, db.conn)
+
+        if pending_orders is not None: 
+
+            process_orders(pending_orders)
+
+    

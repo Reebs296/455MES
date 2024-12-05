@@ -114,12 +114,13 @@ if __name__ == '__main__':
     pending_orders = None
 
     db = DatabaseController()
+    db.buildTables()
 
     while True:
 
         pending_orders = load_orders(db.c, db.conn)
 
-        if pending_orders is not None: 
+        if len(pending_orders) != 0: 
 
             process_orders(pending_orders)
 

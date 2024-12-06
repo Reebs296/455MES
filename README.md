@@ -22,7 +22,7 @@ The **Manufacturing Execution System (MES)** is a user-friendly application deve
 
 ### **3. Real-Time Monitoring**
 - Displays live data of the machine’s operational status.
-- Tracks the progress of orders in real time.
+- Tracks the progress of orders in real-time.
 
 ---
 
@@ -34,24 +34,6 @@ The application is built using:
 - **Languages:** Python (Primary)
 
 ---
-
-## Project Structure (WILL BE UPDATED)
-
-```plaintext
-MES/
-├── main.py          # Main application entry point
-├── ui/              # UI-related files
-│   ├── login.ui     # Login interface
-│   ├── dashboard.ui # Main dashboard
-├── db/              # Database-related files
-│   ├── init_db.py   # Database initialization script
-│   ├── database.db  # SQLite3 database file
-├── modules/         # Custom modules
-│   ├── auth.py      # Authentication logic
-│   ├── orders.py    # Order management logic
-│   ├── monitoring.py# Real-time monitoring logic
-└── README.md        # Project documentation (this file)
-```
 
 ## Learning Objectives
 
@@ -120,18 +102,10 @@ After cloning the repository, navigate to the project directory:
    cd MES_Project
    ```
 
-## Step 4: Install Dependencies
-
-To install the required dependencies, make sure you are in the project directory and run:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Step 5: Run the MES Server
+## Step 4: Run the MES Server
 
 Once the dependencies are installed, start the MES application by running:
 
    ```bash
-   run TestRun.py
+   run Main.py
    ```

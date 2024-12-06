@@ -34,7 +34,7 @@ def load_orders(cursor, conn):
     for order in temp_list:
 
         if order[1] == 'Red' or 'Black': taskCode = 1
-        elif order[1] == 'Blue' or 'White': taskCode = 0
+        elif order[1] == 'Blue' or 'Grey': taskCode = 2
         else: taskCode == -1
 
         temp_order = Order(int(order[0]), taskCode, None)

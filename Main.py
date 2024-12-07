@@ -11,6 +11,7 @@ from oeePlotter import OEEPlotter
 from partRejectionPlotter import RejectionPlotter
 from oeeCalculator import OEECaculator
 from DatabaseController import DatabaseController
+from shiftSchedPlotter import ShiftSchedPlotter
 #import CPLabCommunication
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
@@ -24,6 +25,7 @@ from PyQt5.QtWidgets import QGraphicsRectItem, QPushButton, QDateTimeEdit, QMess
 class MANF455_Widget(qtw.QMainWindow):
     def __init__(self):
         super().__init__()
+        
         # create all page objects
         self.ui = Ui_MainWindow()
         self.ui_overview = Ui_Overview()
@@ -32,15 +34,19 @@ class MANF455_Widget(qtw.QMainWindow):
         self.ui_existingOrders = Ui_ExistingOrders()
         self.ui_orderSched = Ui_OrderSchedule()
         self.ui_shiftSched = Ui_ShiftSchedule()
+        
         # Set up a QTimer to update the date and time every second
         self.timer = qtc.QTimer(self)
         self.timer.timeout.connect(self.updateDateTime)
         self.timer.start(1000)  # Timeout interval in milliseconds (1000ms = 1 second)
         self.date_range = []  # Initialize date_range as an empty list
+          
         # launch login page
         self.ui.setupUi(self)
+        
         # Connect the Enter button to the checkCredentials method
         self.ui.Enter.clicked.connect(self.checkCredentials)
+    
     def updateDateTime(self):
         # Update the date and time for the current page (or add specific logic if you want different behavior)
         if hasattr(self, 'current_ui'):
@@ -89,6 +95,7 @@ class MANF455_Widget(qtw.QMainWindow):
         else:
             # Show denied message for invalid credentials
             qtw.QMessageBox.warning(self, "Login Status", "Denied!")    
+
 #This is the function to handle buttons on the Overview Page
     def showOverviewPage(self):
         self.ui_overview.setupUi(self)
@@ -111,6 +118,7 @@ class MANF455_Widget(qtw.QMainWindow):
         # Display the full name and role in the QTextBrowser widgets on the overview page
         self.displayUserFullName()
         self.displayUserRole()
+
 #This is the function to handle buttons on the OEE Page
     def showOeePage(self):
         self.ui_oee.setupUi(self)
@@ -139,6 +147,7 @@ class MANF455_Widget(qtw.QMainWindow):
         
         # button on overview page to generate quality calculation
         self.ui_oee.pushButton.clicked.connect(self.submitButton)
+
 #This is the function to handle buttons on the New Orders Page
     def showNewOrdersPage(self):
         self.ui_newOrders.setupUi(self)
@@ -161,6 +170,7 @@ class MANF455_Widget(qtw.QMainWindow):
         # Connect buttonBox signals to the appropriate functions
         self.ui_newOrders.buttonBox.accepted.connect(self.onOkClicked)
         self.ui_newOrders.buttonBox.rejected.connect(self.onCancelClicked)
+
 #This is the function to handle buttons on the Existing Orders Page
     def showExistingOrdersPage(self):
         self.ui_existingOrders.setupUi(self)
@@ -186,6 +196,7 @@ class MANF455_Widget(qtw.QMainWindow):
     
     #def showInventoryPage(self):
     #def showTrackingPage(self):
+
 #This is the function to handle buttons on the Order Schedule Page
     def showOrderSchedulePage(self):
         self.ui_orderSched.setupUi(self)
@@ -203,6 +214,7 @@ class MANF455_Widget(qtw.QMainWindow):
         self.ui_orderSched.pushButton_14.clicked.connect(self.showNewOrdersPage)
         # button on overview page to change to shift scheduling page
         self.ui_orderSched.pushButton_13.clicked.connect(self.showShiftSchedulePage)
+
 #This is the function to handle buttons on the Shift Schedule Page
     def showShiftSchedulePage(self):
         self.ui_shiftSched.setupUi(self)
@@ -220,7 +232,15 @@ class MANF455_Widget(qtw.QMainWindow):
         self.ui_shiftSched.pushButton_14.clicked.connect(self.showNewOrdersPage)
         # button on overview page to change to order scheduling page
         self.ui_shiftSched.pushButton_10.clicked.connect(self.showOrderSchedulePage)
+
+        # button on shift schedule page to submit employee and shift information
+        self.ui_shiftSched.pushButton.clicked.connect(self.submitShift)
+
+        # button on shift schedule page to submit employee and shift information
+        #self.ui_shiftSched.pushButton.clicked.connect(self.updateShifts)
+    
     #def showReportsPage(self):
+
 ############################################################################################
 # Below is a set of Functions to be Performed based on the GUI Page Listed.
 # Overview Page Functions:
@@ -256,14 +276,15 @@ class MANF455_Widget(qtw.QMainWindow):
             print("Error: No dates generated.")
             QMessageBox.warning(self, "Error", "Date range is empty. Please set a valid date range.")
             return
+    
     # ************************ NEEDS TO BE UPDATED WITH DATABASE INFO **************************************
         # Ensure the length of the date list is consistent with the length of the generated arrays
         num_dates = len(dates)
         # Generate values for OEE, Availability, Performance, and Quality between 0 and 100
-        oee_values = [random.randint(0, 100) for _ in range(num_dates)]
-        availability_values = [random.randint(0, 100) for _ in range(num_dates)]
-        performance_values = [random.randint(0, 100) for _ in range(num_dates)]
-        quality_values = [random.randint(0, 100) for _ in range(num_dates)]
+        oee_values = [random.randint(50, 100) for _ in range(num_dates)]
+        availability_values = [random.randint(50, 100) for _ in range(num_dates)]
+        performance_values = [random.randint(50, 100) for _ in range(num_dates)]
+        quality_values = [random.randint(50, 100) for _ in range(num_dates)]
         # Create an instance of OEEPlotter and plot the data
         oee_plotter = OEEPlotter(self.ui_oee.graphicsView_3)  # Pass graphicsView_3 widget to the plotter
         oee_plotter.plot_oee_data(dates, oee_values, availability_values, performance_values, quality_values)
@@ -279,6 +300,7 @@ class MANF455_Widget(qtw.QMainWindow):
         time_intervals = ["Hourly", "Daily", "Weekly", "Monthly", "Annually"]
         rejected_parts = [hourly, daily, weekly, monthly, annually]  # Example data
         rejected_plotter.plot_rejected_parts(time_intervals, rejected_parts)
+    
     # *******************************************************************************************************
     def calculateAvailability(self):
         # Create an instance of OEECaculator
@@ -530,8 +552,11 @@ class MANF455_Widget(qtw.QMainWindow):
         self.edit_mode = False
         print("Update cancelled")
 # Orders Schedule Page Functions:
+
 # Shift Schedule Page Functions:
+
 # Shift Schedule Page Functions:
+    
     def submitShift(self):
         shifts = {"Morning": (6, 14), "Afternoon": (14, 22), "Night": (22, 6)}
         schedule = []
@@ -545,11 +570,16 @@ class MANF455_Widget(qtw.QMainWindow):
         print("First Name: " + firstName)
         print("Last Name: " + lastName)
         print("Employee Number: " + employeeNumber)
-        print("Max Hours: " + maxHours)
-        print("Min Hours: " + minHours)
-        # Convert dates to datetime objects
-        start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        print("Max Hours: " + str(maxHours))
+        print("Min Hours: " + str(minHours))
+        
+        # Convert QDate to datetime object directly
+        start_date = datetime(start_date.year(), start_date.month(), start_date.day())
+        end_date = datetime(end_date.year(), end_date.month(), end_date.day())
+
+        print("Start Date: " + start_date.strftime("%Y-%m-%d"))
+        print("End Date: " + end_date.strftime("%Y-%m-%d"))
+
         try:
             db = DatabaseController()
             db.buildTables()
@@ -558,20 +588,22 @@ class MANF455_Widget(qtw.QMainWindow):
             print("Data successfully inserted into the database.")
             # Test print Orders/Customers tables
             print("\nShift Schedule Table:")
-            db.c.execute("SELECT * FROM ShiftSchedule")
+            db.c.execute("SELECT * FROM ShiftSchedules")
             customers = db.c.fetchall()
             for row in customers:
                 print(row)
+            # Now, update the shifts
+            self.updateShifts(firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date)
             
         except sqlite3.Error as e:
             print(f"An error occurred while inserting data: {e}")
             db.conn.rollback()
-    def updateShifts(firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date):
-        # Function will update the figure in the Shift Schedule window to display the shifts
-        # Get data
-        # Format data
-        # Display data
-        return
+    
+    def updateShifts(self, firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date):
+        # Create an instance of ShiftSchedPlotter and pass the parameters to it
+        self.shift_plotter = ShiftSchedPlotter(self.ui_shiftSched.graphicsView_3, firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date)
+        self.shift_plotter.plot_shift_schedule()
+
 if __name__ == '__main__':
 # MAIN COMMUNICATION LOOP ############################################################################################
     # Connect to the database

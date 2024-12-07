@@ -13,6 +13,9 @@ class DatabaseController:
 
     def buildTables(self):
 
+        # Drop ShiftSchedules table if it exists to ensure we create it with the correct schema
+        self.c.execute("DROP TABLE IF EXISTS ShiftSchedules;")
+
         # Create Customers table
         self.c.execute("""
         CREATE TABLE IF NOT EXISTS Customers (
@@ -41,12 +44,12 @@ class DatabaseController:
         );
         """)
 
-
         # Create Employees table
         self.c.execute("""
         CREATE TABLE IF NOT EXISTS Employees (
             employee_id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
+            firstName TEXT NOT NULL,
+            lastName TEXT NOT NULL,          
             role TEXT NOT NULL,
             required_hours INTEGER NOT NULL DEFAULT 40  -- Default to 40 hours per week
         );
@@ -64,13 +67,13 @@ class DatabaseController:
         # Create ShiftSchedules table
         self.c.execute("""
         CREATE TABLE IF NOT EXISTS ShiftSchedules (
-            shift_id INTEGER PRIMARY KEY,
-            employee_id INTEGER NOT NULL,
-            start_time DATETIME NOT NULL,
-            end_time DATETIME NOT NULL,
-            shift_type TEXT NOT NULL,  -- Morning, Afternoon, Night
-            status TEXT NOT NULL,
-            FOREIGN KEY (employee_id) REFERENCES Employees (employee_id)
+            firstName TEXT NOT NULL,
+            lastName TEXT NOT NULL,
+            employeeNumber INTEGER NOT NULL,
+            maxHours INTEGER NOT NULL,
+            minHours INTEGER NOT NULL,
+            start_date DATETIME NOT NULL,
+            end_date DATETIME NOT NULL
         );
         """)
 
@@ -156,10 +159,11 @@ class DatabaseController:
         SET product_type = ?, upper_color = ?, lower_color = ?, upper_limit = ?, lower_limit = ?, order_date = ?, order_time = ?
         WHERE product_number = ?
         """, (product_type, upper_color, lower_color, upper_limit, lower_limit, order_date, order_time, product_number))
+    
     def populateShifts(self, firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date):
         # If the employee number matches with dates on the current sched, then the new info replaces that
         self.c.execute("""
-        INSERT INTO ShiftSchedule (firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date)
+        INSERT INTO ShiftSchedules (firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date)
         VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (firstName, lastName, employeeNumber, maxHours, minHours, start_date, end_date))
 
